@@ -10,13 +10,17 @@ def preprocess_text(text):
     # 2. Convertir a minúscula
     text = text.lower()
     
-    # 3. Substituir salts de línia per un doble espai
-    text = re.sub(r'\n+', '  ', text)
-    
-    # 4. Substituir altres espais en blanc continus per un sol espai
+    # 3. Substituir espais o tabulacions seguits per un de sol 
+    # (Ho fem ABANS, així no "ens mengem" els dobles espais que crearem després)
     text = re.sub(r'[ \t]+', ' ', text)
     
-    # 5. Eliminar espais inicials i finals
+    # 4. Eliminar espais en blanc que hi pugui haver just abans o després d'un salt de línia
+    text = re.sub(r' *\n *', '\n', text)
+    
+    # 5. ARA SÍ: Convertir tots els salts de línia a un doble espai i blindar-los
+    text = re.sub(r'\n+', '  ', text)
+    
+    # 6. Eliminar espais inicials i finals de tot l'arxiu
     text = text.strip()
     
     return text
