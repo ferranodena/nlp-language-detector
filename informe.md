@@ -371,21 +371,38 @@ El Lidstone Smoothing és una tècnica d'estimació de probabilitats que s'utili
 
 #### 4.1.1 Implementació
 
-B per cada idioma, com es calcula
+A la fase d'entrenament, el model calcula les freqüències dels trigrames per a cada idioma, així com els paràmetres $B$ (nombre total de trigrames únics) i $N_t$ (nombre total de trigrames observats), i guardem en un arxiu `.json` juntament amb el valor de $\lambda$ utilitzat, que per defecte és 0.5. Aquesta informació és essencial per a la fase de predicció, on el model utilitza aquestes freqüències i paràmetres per calcular les probabilitats dels trigrames en els documents de test i determinar a quin idioma pertanyen. Un cop entrenat, el model es pot carregar des d'aquest arxiu `.json` per a realitzar les prediccions sense necessitat de tornar a entrenar-lo, facilitant així la seva reutilització i aplicació en diferents conjunts de dades.
 
-Pel que fa els aspectes tècnincs...:
+La inferència es realitza, donat un text, dividint-lo en trigrames i calculant la probabilitat de cada trigram per a cada idioma utilitzant la fórmula del Lidstone Smoothing, que incorpora el valor de $\lambda$ per ajustar les freqüències observades. Per tant, utlitzant les freqüències dels trigrames i els paràmetres $B$ i $N_t$ calculats durant l'entrenament, el model calcula la probabilitat de cada trigram per a cada idioma i, finalment, multiplica aquestes probabilitats per obtenir la probabilitat total del document per a cada idioma, o equivalentment, suma els logaritmes de les probabilitats per eficiència computacional:
 
-!!! La implementació del Lidstone Smoothing ha sigut a través d'una classe `LidstoneModel`, que encapsula tota la lògica necessària per a entrenar el model, refinar el paràmetre $\lambda$ i avaluar el rendiment del model. Aquesta classe inclou mètodes per a:
+$$
+P^T(e_j) = P^T_{LID}(e_j)= \frac{C_t(e_j) + \lambda}{N_t + \lambda B}
+$$
 
-- `__init__`: Inicialitza el model amb un valor de $\lambda$ i una llista de llengües.
-- `fit`: Entrena el model amb les dades d'entrenament, calculant els trigrames i les seves freqüències, així com els paràmetres $B$ i $N_t$.
+$$
+P(\hat{d}) = P(e_1, \dots, e_s) = \prod_{j=1}^{s} P(e_j)
+$$
+
+O equivalentment, en termes de logaritmes:
+
+$$
+\log P(\hat{d}) = \sum_{j=1}^{s} \log P(e_j)
+$$
+
+El model selecciona l'idioma que té la probabilitat més alta com a predicció final per al document de test. Per tal d'anar més enllà i refinar el valor de $\lambda$, es realitza una validació creuada, on el conjunt d'entrenament es divideix en sub-conjunts i el model es prova amb diferents valors de $\lambda$ per determinar quin proporciona la millor precisió (accuracy) en els conjunts de validació. Aquesta etapa és crucial per optimitzar el rendiment del model i assegurar que no s'està sobreajustant als dades d'entrenament, permetent així una millor generalització a dades noves. Es proven diferents lambdes que van del 0.01 al 1, i es selecciona aquell que maximitza l'accuracy del model en els conjunts de validació, per cada idioma.
+
+En termes de codi, el model es defineix com una classe `LanguageDetector`, que inclou els següents mètodes:
+
+- `__init__`: Inicialitza el model amb un valor de $\lambda$, que per defecte és 0.5.
+- `fit`: Entrena el model amb les dades d'entrenament, calculant els trigrames i les seves freqüències, així com els paràmetres $B$ i $N_t$. Retorna un arxiu `.json` amb els paràmetres del model.
 - `load_model`: Carrega un model preentrenat des d'un fitxer `.json`.
-- `predict_model`: Realitza la predicció de la llengua d'un document de test, calculant les probabilitats per a cada llengua i seleccionant la que té la probabilitat més alta.
-- `refining_lambda`: Realitza una validació creuada per a refinar el valor de $\lambda$, provant diferents valors i seleccionant aquell que maximitza l'accuracy del model.
+- `predict_text`: Realitza la predicció de l'idioma d'un frase donada, calculant les probabilitats dels trigrames i seleccionant l'idioma amb la probabilitat més alta.
+- `refining_lambda`: Realitza una validació creuada per a refinar el valor de $\lambda$, provant diferents valors i seleccionant aquell que maximitza l'accuracy del model. Aquest mètode sobreescriu el valor de $\lambda$ del model amb el valor optimitzat.
 - `evaluate_model`: Avalua el rendiment del model amb les dades de test, calculant l'accuracy i la matriu de confusió.
 
 #### 4.1.2 Refinament del paràmetre $\lambda$
 
+Un cop implementat el model amb Lidstone Smoothing, es procedeix a refinar el paràmetre $\lambda$ per optimitzar el rendiment del model. Aquesta etapa és crucial perquè el valor de $\lambda$ afecta directament la suavització de les probabilitats dels trigrames i, per tant, la capacitat del model per generalitzar a dades noves. Els resultats de la validació creuada mostren com diferents valors de $\lambda$ no impacten en l'accuracy
 #### 4.1.2 Anàlisi dels resultats i error
 
 ### 4.2 Segon Smoothing
