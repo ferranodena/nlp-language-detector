@@ -590,3 +590,67 @@ Si analitzem les frases mal classificades, podem veure certs patrons en les fras
     ```
 
     La llengua més comuna en aquests errors és el castellà, que es confon amb l'italià i el francès, probablement perquè comparteixen moltes paraules i estructures similars, i perquè el model pot tenir més dificultats per distingir-los quan les frases són curtes o contenen paraules comunes.
+
+### 4.2 Interpolation Smoothing
+
+El model d’Interpolation Smoothing s’ha utilitzat com una millora respecte al suavitzat de Lidstone, ja que permet combinar informació de diferents nivells de n-grams per aconseguir prediccions més estables. La idea principal d’aquest mètode és que no sempre és necessari dependre únicament de la freqüència del trigram complet, sinó que també pot ser útil considerar informació parcial quan el trigram exacte no apareix en el corpus d’entrenament.
+
+#### 4.2.1 Implementació
+En concret, la probabilitat d’un trigram es calcula com una combinació lineal de quatre components diferents: la probabilitat del trigram complet, la del bigram associat (els dos últims caràcters del trigram), la del unigram corresponent i, finalment, una probabilitat uniforme que actua com a salvaguarda quan el model es troba amb seqüències desconegudes.
+
+Matemàticament, aquesta combinació es representa com:
+
+
+\[
+P_{interp}(t)=
+\lambda_3 P_3(t)+
+\lambda_2 P_2(t)+
+\lambda_1 P_1(t)+
+\lambda_0 P_u
+\]
+
+On cada terme té el següent significat:
+
+- \(P_3(t)\) és la probabilitat estimada del trigram observat dins del corpus d’entrenament.  
+- \(P_2(t)\) correspon a la probabilitat del bigram associat, format pels dos darrers caràcters del trigram.  
+- \(P_1(t)\) representa la probabilitat del unigram associat al darrer caràcter.  
+- \(P_u = \frac{1}{V}\) és una distribució uniforme sobre l’alfabet de mida \(V\), que ajuda a evitar probabilitats zero en casos on la seqüència no s’ha observat mai.
+
+Els coeficients \(\lambda_i\) han de complir que la seva suma sigui igual a 1 i que cap d’ells sigui negatiu, de manera que la combinació resulti en una distribució de probabilitat vàlida.
+
+Durant l’entrenament del model, es calculen els comptadors de freqüència dels diferents nivells de n-grams per a cada idioma. Posteriorment, aquests comptadors s’utilitzen juntament amb els pesos d’interpolació per obtenir una estimació global de la probabilitat del document.
+
+En termes de codi, definim el model com una altra classe, `InterpolationLanguageModel`, amb els seguents mètodes:
+- `__init__`: inicialitza el model amb valors de lambda per defecte.
+- `fit`: permet entrenar el model a partir d’un conjunt de trigrames emmagatzemats en format JSON, calculant les freqüències dels diferents n-grams necessaris per estimar les probabilitats condicionals. Internament, el mètode `_fit_from_dict` construeix els comptadors estadístics d’unigrames, bigrames i trigrames, així com els comptadors de context associats, que són necessaris per a l’estimació correcta de les probabilitats condicionals.
+- `load_model`: carrega un model preentrenat dins d'un fitxer `.json`.
+- `predict_text`: realitza la classificació d’un text preprocessat calculant la probabilitat logarítmica interpolada per a cada idioma i seleccionant l’idioma amb la puntuació més alta.
+- `_interpolated_log_prob`: implementa el càlcul central del model, estimant la probabilitat logarítmica d’un trigram mitjançant estimadors de màxima versemblança condicionals i aplicant els pesos d’interpolació.
+- `_score_text`: calcula la puntuació global d’un document sumant les contribucions logarítmiques de tots els trigrames presents.
+- `evaluate`: permet avaluar el rendiment del model sobre un corpus de prova en format `.json`.
+
+#### 4.2.2 Anàlisi dels resultats i errors
+
+Un cop entrenat el model, procedim a validar-lo amb el corpus d'entrenament. Comencem observant la matriu de confusió obtinguda:
+
+<div class="image-row">
+  <div class="image-column">
+    <img src="./images/confusion_matrix_interpolation.png" alt="Matriu de Confusió">
+    <div class="caption">Figura 1: Matriu de confusió del model amb Lidstone Smoothing.</div>
+  </div>
+</div>
+
+Observem que, al igual que en el model anterior, obtenim un rendiment gairebé perfecte. Per a tots els idiomes, de les 6000 mostres d'avaluació, el nostre model ha encertat més de 5975, cosa que ens indica que comet molts pocs errors.
+
+Podem analitzar també les mètriques de rendiment:
+
+| Classe | Precision | Recall | F1-score | Support |
+|--------|-----------|--------|----------|---------|
+| deu | 1.00 | 1.00 | 1.00 | 5986 |
+| eng | 1.00 | 1.00 | 1.00 | 5987 |
+| fra | 1.00 | 1.00 | 1.00 | 6000 |
+| ita | 1.00 | 1.00 | 1.00 | 6000 |
+| nld | 1.00 | 1.00 | 1.00 | 6000 |
+| spa | 1.00 | 1.00 | 1.00 | 6000 |
+
+Les mètriques també reflecteixen aquest comportament excel·lent del model, amb valors de precision, recall i F1-score tots igual a 1. Aquestes xifres confirmen que el nostre model de classificació presenta una capacitat altíssima de discriminació entre les diferents llengues considerades.
