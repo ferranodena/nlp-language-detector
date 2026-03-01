@@ -5,52 +5,61 @@ body {
   font-size: 9pt;
   text-align: justify;
   line-height: 1.4;
+  margin: 0.5cm;  /* Marges generals del body reduïts */
 }
 
 /* Paràgrafs justificats */
 p {
   text-align: justify;
   font-size: 9pt;
+  margin: 0.3rem 0;  /* Marges verticals reduïts */
 }
 
 /* Estils per a les llistes amb la mateixa mida que el text normal */
 ul, ol, code {
   font-size: 9pt;
   line-height: 1.4;
+  margin: 0.3rem 0;  /* Marges verticals reduïts */
 }
 
 li {
   font-size: 9pt;
   line-height: 1.4;
+  margin: 0.2rem 0;  /* Marges entre elements de llista reduïts */
 }
 
 /* Títols més petits */
 h1 {
   font-size: 13pt;
   text-align: left;
+  margin: 0.5rem 0 0.4rem 0;  /* Marges reduïts */
 }
 
 h2 {
   font-size: 12pt;
   text-align: left;
   font-weight: bold;
+  margin: 0.4rem 0 0.3rem 0;  /* Marges reduïts */
 }
 
 h3 {
   font-size: 11pt;
   text-align: left;
   font-weight: bold;
+  margin: 0.3rem 0 0.3rem 0;  /* Marges reduïts */
 }
 
 h4 {
   font-size: 9pt;
   text-align: left;
+  margin: 0.3rem 0 0.2rem 0;  /* Marges reduïts */
 }
 
 h5{
   font-size: 9pt;
   text-align: left;
   text-decoration: underline;
+  margin: 0.3rem 0 0.2rem 0;  /* Marges reduïts */
 }
 
 /* CORRECCIONS PER A BLOCS DE CODI */
@@ -61,12 +70,13 @@ pre {
   word-wrap: break-word;
   overflow-wrap: break-word;
   background-color: #f5f5f5;
-  padding: 0.5rem;
+  padding: 0.3rem;  /* Padding reduït */
   border: 1px solid #ddd;
   border-radius: 3px;
   font-size: 8pt;
   line-height: 1.4;
   min-width: 0;
+  margin: 0.5rem 0;  /* Marges verticals reduïts */
 }
 
 code {
@@ -81,17 +91,17 @@ code {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;       /* Espai entre imatges */
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.6rem;       /* Espai entre imatges reduït */
+  margin-top: 0.6rem;  /* Marges reduïts */
+  margin-bottom: 0.6rem;
   align-items: flex-start;
   width: 100%;
 }
 
 /* MODIFICAT: Reduïm la base (flex-basis) a 180px perquè hi capiguin 3 en una fila */
 .image-column {
-  flex: 1 1 180px; /* Abans 280px. Amb 180px, 3 imatges sumen ~540px + marges, que hi cap perfecte */
-  max-width: 320px; /* Mida màxima per evitar que es facin gegants si n'hi ha poques */
+  flex: 1 1 180px;
+  max-width: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -107,7 +117,7 @@ code {
 /* Imatges */
 .image-column img {
   width: 100%;
-  max-height: 280px; /* Limitem l'alçada */
+  max-height: 280px;
   height: auto;
   display: block;
   object-fit: contain;
@@ -115,7 +125,7 @@ code {
 
 /* Peu de foto */
 .image-column .caption {
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;  /* Marge reduït */
   font-size: 8pt;
   text-align: center;
   color: #555;
@@ -128,9 +138,9 @@ code {
 .image-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.8rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;  /* Espai entre elements reduït */
+  margin-top: 0.6rem;  /* Marges reduïts */
+  margin-bottom: 0.6rem;
   width: 100%;
   max-width: 720px;
   margin-left: auto;
@@ -157,7 +167,7 @@ code {
 
 /* Peu de foto per a cada imatge del grid */
 .image-grid .grid-item .caption {
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;  /* Marge reduït */
   font-size: 8pt;
   text-align: center;
   color: #555;
@@ -166,7 +176,7 @@ code {
 
 /* Peu de figura general (opcional, per sota de tot el grid) */
 .image-grid-caption {
-  margin-top: 0.8rem;
+  margin-top: 0.5rem;  /* Marge reduït */
   font-size: 8pt;
   text-align: center;
   color: #555;
@@ -182,9 +192,9 @@ code {
 /* Bloc imatge-esquerra / text-dreta */
 .media-row {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;  /* Espai reduït */
   align-items: flex-start;
-  margin: 1rem 0;
+  margin: 0.6rem 0;  /* Marges reduïts */
   min-width: 0;
 }
 
@@ -203,7 +213,7 @@ code {
 }
 
 .media-image .caption {
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;  /* Marge reduït */
   font-size: 8pt;
   text-align: center;
   color: #555;
@@ -219,7 +229,7 @@ code {
     ============================================ */
 .table-container {
   width: 100%;
-  margin: 1.5rem 0;
+  margin: 0.8rem 0;  /* Marges reduïts */
   overflow-x: auto;
   page-break-inside: avoid;
 }
@@ -241,7 +251,7 @@ code {
 }
 
 .table-container th {
-  padding: 8px 6px;
+  padding: 6px 4px;  /* Padding reduït */
   text-align: center;
   border: 1px solid #888;
   font-size: 7pt;
@@ -249,7 +259,7 @@ code {
 
 /* Files de dades */
 .table-container td {
-  padding: 6px 5px;
+  padding: 5px 4px;  /* Padding reduït */
   text-align: center;
   border: 1px solid #aaa;
   font-size: 7pt;
@@ -266,7 +276,7 @@ code {
 
 /* Peu de taula (caption) */
 .table-container .table-caption {
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;  /* Marge reduït */
   font-size: 8pt;
   text-align: center;
   color: #555;
@@ -275,7 +285,7 @@ code {
 
 /* Estil alternatiu: caption sobre la taula */
 .table-container .table-title {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;  /* Marge reduït */
   font-size: 9pt;
   text-align: center;
   font-weight: bold;
@@ -284,6 +294,10 @@ code {
 
 /* Millores per a impressió/PDF */
 @media print {
+  body {
+    margin: 1cm 1.2cm;  /* Marges de pàgina més petits per a PDF */
+  }
+
   .table-container {
     page-break-inside: avoid;
   }
@@ -327,6 +341,7 @@ code {
 }
 
 @page {
+  margin: 2.54cm 1cm;  
   @bottom-center {
     content: "Pàgina " counter(page) " de " counter(pages);
     font-size: 8pt;
@@ -336,22 +351,17 @@ code {
 }
 </style>
 
-# Pràctica 1 PLH: Detecció d'idiomes
-
 ## 0. Taula de Continguts
 
-- [Pràctica 1 PLH: Detecció d'idiomes](#pràctica-1-plh-detecció-didiomes)
-  - [0. Taula de Continguts](#0-taula-de-continguts)
-  - [1. Introducció](#1-introducció)
-  - [2. Dades del problema](#2-dades-del-problema)
-  - [3. Preprocessament](#3-preprocessament)
-  - [4. Implementació dels models](#4-implementació-dels-models)
-    - [4.1 Lidstone Smoothing](#41-lidstone-smoothing)
-      - [4.1.1 Implementació](#411-implementació)
-      - [4.1.2 Refinament del paràmetre $\\lambda$](#412-refinament-del-paràmetre-lambda)
-      - [4.1.2 Anàlisi dels resultats i error](#412-anàlisi-dels-resultats-i-error)
-    - [4.2 Segon Smoothing](#42-segon-smoothing)
-      - [4.2.2 Anàlisi dels resultats](#422-anàlisi-dels-resultats)
+- [0. Taula de Continguts](#0-taula-de-continguts)
+- [1. Introducció](#1-introducció)
+- [2. Dades del problema](#2-dades-del-problema)
+- [3. Preprocessament](#3-preprocessament)
+- [4. Implementació dels models](#4-implementació-dels-models)
+  - [4.1 Lidstone Smoothing](#41-lidstone-smoothing)
+    - [4.1.1 Implementació](#411-implementació)
+    - [4.1.2 Refinament del paràmetre $\\lambda$](#412-refinament-del-paràmetre-lambda)
+    - [4.1.3 Anàlisi dels resultats i errors](#413-anàlisi-dels-resultats-i-errors)
 
 ## 1. Introducció
 
@@ -373,14 +383,16 @@ El Lidstone Smoothing és una tècnica d'estimació de probabilitats que s'utili
 
 A la fase d'entrenament, el model calcula les freqüències dels trigrames per a cada idioma, així com els paràmetres $B$ (nombre total de trigrames únics) i $N_t$ (nombre total de trigrames observats), i guardem en un arxiu `.json` juntament amb el valor de $\lambda$ utilitzat, que per defecte és 0.5. Aquesta informació és essencial per a la fase de predicció, on el model utilitza aquestes freqüències i paràmetres per calcular les probabilitats dels trigrames en els documents de test i determinar a quin idioma pertanyen. Un cop entrenat, el model es pot carregar des d'aquest arxiu `.json` per a realitzar les prediccions sense necessitat de tornar a entrenar-lo, facilitant així la seva reutilització i aplicació en diferents conjunts de dades.
 
-La inferència es realitza, donat un text, dividint-lo en trigrames i calculant la probabilitat de cada trigram per a cada idioma utilitzant la fórmula del Lidstone Smoothing, que incorpora el valor de $\lambda$ per ajustar les freqüències observades. Per tant, utlitzant les freqüències dels trigrames i els paràmetres $B$ i $N_t$ calculats durant l'entrenament, el model calcula la probabilitat de cada trigram per a cada idioma i, finalment, multiplica aquestes probabilitats per obtenir la probabilitat total del document per a cada idioma, o equivalentment, suma els logaritmes de les probabilitats per eficiència computacional:
+La inferència es realitza, donat un text, dividint-lo en trigrames i calculant la probabilitat de cada trigram per a cada idioma utilitzant la fórmula del Lidstone Smoothing, que incorpora el valor de $\lambda$ per ajustar les freqüències observades. Per tant, utlitzant les freqüències dels trigrames i els paràmetres $B$ i $N_{t}$ calculats durant l'entrenament, el model calcula la probabilitat de cada trigram per a cada idioma i, finalment, multiplica aquestes probabilitats per obtenir la probabilitat total del document per a cada idioma, o equivalentment, suma els logaritmes de les probabilitats per eficiència computacional:
 
 $$
-P^T(e_j) = P^T_{LID}(e_j)= \frac{C_t(e_j) + \lambda}{N_t + \lambda B}
+P^T(e_j) = P^T_{\text{LID}}(e_j) = \dfrac{C_t(e_j) + \lambda}{N_t + \lambda B}
 $$
 
+On, per MLE:
+
 $$
-P(\hat{d}) = P(e_1, \dots, e_s) = \prod_{j=1}^{s} P(e_j)
+P(\hat{d}) = P(e_1, \ldots, e_s) = \prod_{j=1}^{s} P(e_j)
 $$
 
 O equivalentment, en termes de logaritmes:
@@ -402,9 +414,179 @@ En termes de codi, el model es defineix com una classe `LanguageDetector`, que i
 
 #### 4.1.2 Refinament del paràmetre $\lambda$
 
-Un cop implementat el model amb Lidstone Smoothing, es procedeix a refinar el paràmetre $\lambda$ per optimitzar el rendiment del model. Aquesta etapa és crucial perquè el valor de $\lambda$ afecta directament la suavització de les probabilitats dels trigrames i, per tant, la capacitat del model per generalitzar a dades noves. Els resultats de la validació creuada mostren com diferents valors de $\lambda$ no impacten en l'accuracy
-#### 4.1.2 Anàlisi dels resultats i error
+Un cop implementat el model amb Lidstone Smoothing, es procedeix a refinar el paràmetre $\lambda$ per optimitzar el rendiment del model. Aquesta etapa és crucial perquè el valor de $\lambda$ afecta directament la suavització de les probabilitats dels trigrames i, per tant, la capacitat del model per generalitzar a dades noves. Aquí tens l'explicació ampliada, conservant el to tècnic i aprofundint en els passos clau de l'algorisme i els mecanismes d'avaluació. Entrem en detall de com funciona aquest mètode.
 
-### 4.2 Segon Smoothing
+El mètode comença llegint el diccionari de freqüències que ja ha generat la fase de `fit` (on cada clau és un trigrama i el valor n'és la freqüència absoluta). Com que per fer la validació creuada necessitem fer particions, el mètode "descomprimeix" o aplana aquest diccionari en una única llista on els trigrames es repeteixen tantes vegades com indica el seu compte. D'aquesta manera, mantenim la distribució estadística real del corpus original de cada idioma. A continuació, remena (*shuffle*) la llista de manera aleatòria i la divideix en $k$ parts iguals (per defecte 4). Això permet estructurar un procés iteratiu on, a cada pas, es fa servir un bloc diferent com a conjunt de validació ($25\%$ de les dades) mentre s'entrena el model amb la resta dels blocs sumats (el $75\%$ de les dades restants).
+L'aportació més rellevant d'aquest mètode és la seva avaluació. Per a cada un dels candidats d'hiperparàmetres establerts a `lambdas_to_test` ($0.001, 0.01, \dots$), el codi prova a avaluar **individualment** cada trigrama de la partició de validació com si es tractés d'un minúscul text desconegut. S'extreu la probabilitat logarítmica d'aquest trigrama concret utilitzant el diccionari generat al *train fold* combinat amb el valor del $\lambda$ candidat actual (ja sigui atorgant probabilitat clàssica a trigrames coneguts, o aplicant l'atenuació logarítmica extrema als desconeguts, també anomenats casos *Out Of Vocabulary*).
 
-#### 4.2.2 Anàlisi dels resultats
+No obstant això, mesurar únicament la probabilitat interna d'un idioma no ens diu fins a quin punt l'algoritme de predicció funciona bé realment; ens interessa una mètrica de precisió objectiva (Accuracy). Per això, per al trigrama que s'està avaluant en aquell moment precís, l'algorisme inspecciona iterativament els paràmetres de **tots els altres idiomes presents al JSON original**, i calcula la puntuació que ells (amb les seves configuracions constants i globals) li assignarien. Només si l'idioma original assoleix una probabilitat de pertinença **estrictament superior** (el resultat logarítmic és menys negatiu) a les probabilitats obtingudes amb els altres idiomes, es comptabilitza un encert (`correct_predictions += 1`). Finalitzats els $k$ cicles d'entrenament i validació per al candidat $\lambda$, es calcula la mitjana global d'aquestes exactituds creuades, obtenint un marge de seguretat en percentatge (l'Accuracy).
+
+Al final del bucle d'avaluació de la llista de candidats, la funció compara el rendiment numèric de tots els $\lambda$ avaluats, seleccionant el que hagi aportat l'Accuracy mitjana més elevada. Si detecta millores amb el nou hiperparàmetre respecte del que tenia anteriorment, la propietat `self.model_params` s'actualitza i el codi obre de nou el fitxer original passat per argument, sobreescrivint el seu contingut per desar de manera permanent aquest "tunning" intern.
+Els resultats d'aquest procés es poden observar a la taula següent, on es mostren els valors de $\lambda$ provats i les seves corresponents precisions (Accuracy) obtingudes a través de la validació creuada:
+
+<div class="table-container">
+  <div class="table-title">Resultats del Refinament del Paràmetre Lambda per Idioma</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Idioma</th>
+        <th>λ = 0.001</th>
+        <th>λ = 0.01</th>
+        <th>λ = 0.05</th>
+        <th>λ = 0.1</th>
+        <th>λ = 0.3</th>
+        <th>λ = 0.5</th>
+        <th>λ = 0.7</th>
+        <th>λ = 1.0</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>deu</strong></td>
+        <td>50.90%</td>
+        <td>50.90%</td>
+        <td style="background-color: #cce5ff; font-weight: bold; border: 1px solid #888;">50.90%</td>
+        <td>50.87%</td>
+        <td>50.86%</td>
+        <td>50.87%</td>
+        <td>50.83%</td>
+        <td>50.83%</td>
+      </tr>
+      <tr>
+        <td><strong>eng</strong></td>
+        <td>44.12%</td>
+        <td>44.12%</td>
+        <td>44.12%</td>
+        <td>44.13%</td>
+        <td>44.11%</td>
+        <td>44.13%</td>
+        <td>44.14%</td>
+        <td style="background-color: #cce5ff; font-weight: bold; border: 1px solid #888;">44.15%</td>
+      </tr>
+      <tr>
+        <td><strong>fra</strong></td>
+        <td>46.61%</td>
+        <td>46.61%</td>
+        <td>46.61%</td>
+        <td>46.60%</td>
+        <td>46.61%</td>
+        <td>46.59%</td>
+        <td>46.60%</td>
+        <td style="background-color: #cce5ff; font-weight: bold; border: 1px solid #888;">46.62%</td>
+      </tr>
+      <tr>
+        <td><strong>ita</strong></td>
+        <td>51.93%</td>
+        <td>51.93%</td>
+        <td>51.94%</td>
+        <td>51.94%</td>
+        <td style="background-color: #cce5ff; font-weight: bold; border: 1px solid #888;">51.94%</td>
+        <td>51.92%</td>
+        <td>51.93%</td>
+        <td>51.79%</td>
+      </tr>
+      <tr>
+        <td><strong>nld</strong></td>
+        <td>49.54%</td>
+        <td>49.54%</td>
+        <td>49.54%</td>
+        <td style="background-color: #cce5ff; font-weight: bold; border: 1px solid #888;">49.55%</td>
+        <td>49.46%</td>
+        <td>49.47%</td>
+        <td>49.41%</td>
+        <td>49.43%</td>
+      </tr>
+      <tr>
+        <td><strong>spa</strong></td>
+        <td>47.81%</td>
+        <td style="background-color: #cce5ff; font-weight: bold; border: 1px solid #888;">47.81%</td>
+        <td>47.80%</td>
+        <td>47.80%</td>
+        <td>47.79%</td>
+        <td>47.79%</td>
+        <td>47.79%</td>
+        <td>47.74%</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="table-caption">
+    Taula 1: Accuracy obtinguda durant la validació creuada per a diferents valors de λ.
+  </div>
+</div>
+
+#### 4.1.3 Anàlisi dels resultats i errors
+
+Un cop refinat el paràmetre $\lambda$ i seleccionat el valor que proporciona la millor precisió, es procedeix a avaluar el model amb les dades de test. Primer de tot observem la matriu de confusió obtinguda:
+
+<div class="image-row">
+  <div class="image-column">
+    <img src="./images/confusion_matrix_lidstone.png" alt="Matriu de Confusió">
+    <div class="caption">Figura 1: Matriu de confusió del model amb Lidstone Smoothing.</div>
+  </div>
+</div>
+
+El primer que destaca és la forta concentració de valors a la diagonal principal (les caselles blau fosc). Això significa que el model encerta de manera aclaparadora l'idioma correcte. Per a cada un dels 6 idiomes, el model ha avaluat 6.000 mostres (ja que la suma de cada fila és 6.000). Les xifres d'encert oscil·len entre 5.970 (alemany i neerlandès, els "pitjors") i 5.994 (francès, el millor), cosa que suposa una exactitud per a cada idioma de:
+
+- Alemany (`deu`): 99.73%
+- Anglès (`eng`): 99.97%
+- Francès (`fra`): 99.97%
+- Italià (`ita`): 99.72%
+- Neerlandès (`nld`): 99.65%
+- Espanyol (`spa`): 99.70%
+
+Aquesta diferència abismal respecte al ~50% obtingut durant el `refining_lambda` s'explica perquè ara no s'està avaluant l'idioma d'un sol trigrama aïllat (3 lletres descontextualitzades), sinó l'acumulació de probabilitats de tots els trigrames d'un text o una frase sencera, on l'estadística esdevé molt robusta. Els errors (nombres fora de la diagonal) són residuals, però permeten observar les relacions i similituds lingüístiques que confonen el model:
+
+**La principal font d'error implica l'Anglès (`eng`):** Si mirem la columna `eng`, veiem que 8 textos alemanys, 4 francesos, 7 italians, 9 neerlandesos i 5 espanyols s'han classificat erròniament com a anglès. Això podria deure's a la presència d'anglicismes internacionals, noms propis o URL dins els textos de prova d'aquests idiomes, o bé a que el model en anglès tingui una distribució de lletres molt neutra i dominant. També podem dentar la **relació Germànica (`deu` vs `nld`):** Es noten lleugeres confusions creuades entre l'alemany i el neerlandès per la seva mateixa arrel lingüística. 4 textos neerlandesos (`nld`) s'han predit com a alemany (`deu`), i 6 textos alemanys s'han predit com a neerlandès.
+Finalment podem veure la**relació Romànica:** També s'observen confusions menors entre les llengües derivades del llatí. L'espanyol i el francès es confonen mútuament 8 cops; l'espanyol i l'italià es confonen 5 i 4 cops respectivament.
+
+Si analitzem les frases mal classificades, podem veure certs patrons en les frases que el model ha etiquetat erròniament, podem observar diferents patrons que expliquen aquestes confusions, i els hem classificat en diferents categories:
+
+1. **Frases que contenen noms propis estrangers, respecte la frase original:**
+   Aquestes frases són les més comunes de fallar, sobretot quan la llengua de la frase original no és l'anglès, ja que l'anglès és un idioma molt dominant i internacional, i molts noms propis, marques, llocs o termes tècnics són d'origen anglès. Per exemple:
+
+   ```text
+   Frase mal classificada: 'freitag, . januar kanye west und paul mccartney bringen gemeinsame single heraus kanye west rappt nun auch mit paul mccartney (archiv).' (True: deu -> Predicted: eng)
+   Frase mal classificada: 'anche air france, klm, thai airways, easyjet e ryanair hanno oggi cancellato i voli.' (True: ita -> Predicted: eng)
+   Frase mal classificada: 'de band bestaat uit zanger/gitarist james bagshaw, gitarist adam smith, bassist thomas warmsley en drummer samuel toms.' (True: nld -> Predicted: eng)
+   Frase mal classificada: 'temas como 'tonight', 'dirty dancer', 'lloro por ti', 'scape', 'hero', 'i like it', fueron parte del repertorio musical.' (True: spa -> Predicted: eng)
+   Frase mal classificada: 'de grey's anatomy à brothers sisters" - yahoo!' (True: fra -> Predicted: eng)
+    ```
+
+    Però també hi ha un cas d'una frase en anglès que conté noms propis d'origen neerlandès, i el model l'ha classificat com a neerlandès:
+
+    ```text
+    Frase mal classificada: 'strong visuals (robrecht heyvaert, cinematography) and sound (hannes de maeyer, composer; joeri verspecht, sound engineer).' (True: eng -> Predicted: nld)
+    ```
+
+2. **Frases que no queda clar quin idioma són, perquè contenen paraules molt comunes o internacionals i perquè són molt curtes:**
+   Aquestes frases, a més de ser molt curtes, contenen paraules que són molt comunes en diversos idiomes o que són internacionals. Això fa que el model no tingui prou informació per distingir clarament a quin idioma pertanyen, i per tant es confonen amb l'anglès o amb altres idiomes. Per exemple:
+
+   ```text
+   Frase mal classificada: 'champions o europa league?' (True: ita -> Predicted: fra)
+   Frase mal classificada: 'ja, mein onkel peter.' (True: deu -> Predicted: nld)
+   Frase mal classificada: '"dal sud", dice.' (True: ita -> Predicted: spa)
+   Frase mal classificada: 'assassin's creed iv (uplay-code) für , euro.' (True: deu -> Predicted: eng)
+   ```
+
+3. **Frases que contenen caràcters estrangers o símbols que no són habituals en l'idioma original:**
+    Aquestes frases contenen caràcters o símbols que no són habituals en l'idioma original, com ara caràcters d'altres llengües:
+
+    ```text
+    Frase mal classificada: 'ali adnan kadhim nassir al-tameemi ( arabisch : علي عدنان كاظم ناصر التميمي) (adhamiyah, december ) - alias ali adnan - is een irakees voetballer die bij voorkeur als linksback speelt.' (True: nld -> Predicted: eng)
+    Frase mal classificada: 'ю. левянт moscú, de febrero, ria novosti.' (True: spa -> Predicted: ita)
+    Frase mal classificada: 'asî es, aûn nos quedan varios dîas :d.' (True: spa -> Predicted: fra)
+    Frase mal classificada: 'nyborg: hvad er din foretrukne bevaringsværdige bygning i nyborg kommune?' (True: deu -> Predicted: eng)
+    ```
+
+4. **Errors del model:** Aquí en aquest cas, el model ha comès un error de classificació on queda clar en quin idioma està escrita la frase, però el model l'ha etiquetada erròniament. Per exemple:
+
+    ```text
+    Frase mal classificada: 'joder, tiene que molar mazo tener un coche que te diga "shiu shiuiuiu hola maiquel, shiuu shiuiu", pero con la voz de chiquito de la calzada.' (True: spa -> Predicted: ita)
+    Frase mal classificada: 'american and iranian diplomats began meeting last week in vienna.' (True: eng -> Predicted: nld)
+    Frase mal classificada: 'pilar vive a plenitud ser madre.' (True: spa -> Predicted: fra)
+    Frase mal classificada: '"¡va por ti!, ¡ay, que nos la han quitao!' (True: spa -> Predicted: fra)
+    Frase mal classificada: 'marzo: estalla un conflicto civil.' (True: spa -> Predicted: ita)
+    Frase mal classificada: 'en fin, a ver si espabilamos ¡hombre!' (True: spa -> Predicted: fra)
+    ```
+
+    La llengua més comuna en aquests errors és el castellà, que es confon amb l'italià i el francès, probablement perquè comparteixen moltes paraules i estructures similars, i perquè el model pot tenir més dificultats per distingir-los quan les frases són curtes o contenen paraules comunes.
