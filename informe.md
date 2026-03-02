@@ -640,7 +640,16 @@ Un cop entrenat el model, procedim a validar-lo amb el corpus d'entrenament. Com
   </div>
 </div>
 
-Observem que, al igual que en el model anterior, obtenim un rendiment gairebé perfecte. Per a tots els idiomes, de les 6000 mostres d'avaluació, el nostre model ha encertat més de 5975, cosa que ens indica que comet molts pocs errors.
+Observem que, al igual que en el model anterior, obtenim un rendiment gairebé perfecte. Per a cada idioma, el model avalua 6.000 mostres i les xifres d'encert per idioma són:
+
+- Alemany (deu): 99,6%
+- Anglès (eng): 99,68%
+- Francès (fra): 99,97%
+- Italià (ita): 99,77%
+- Neerlandès (nld): 99,78%
+- Espanyol (spa): 99,9%
+
+Aquests resultats són molt similars als que vam obtenir amb el model de Lidstone, la qual cosa ens indica que tots dos models s'acaben comportant de manera gairebé equivalent sobre aquest conjunt de dades. Tot i així, sí que s'aprecien petites diferències entre els dos: per exemple, l'espanyol millora lleugerament passant del 99,70% al 99,90%, i el francès pràcticament no comet cap error. En canvi, l'alemany pateix una petita davallada respecte al Lidstone, baixant del 99,73% al 99,60%. Aquestes diferències, però, són tan petites que no permeten concloure que un model sigui clarament superior a l'altre; en tot cas, apunten que la interpolació afegeix una mica de robustesa en alguns idiomes i perd una mica en d'altres, segurament en funció de com de ben representats estan els n-grames de cada nivell en el corpus d'entrenament.
 
 Podem analitzar també les mètriques de rendiment:
 
@@ -653,4 +662,7 @@ Podem analitzar també les mètriques de rendiment:
 | nld | 1.00 | 1.00 | 1.00 | 6000 |
 | spa | 1.00 | 1.00 | 1.00 | 6000 |
 
-Les mètriques també reflecteixen aquest comportament excel·lent del model, amb valors de precision, recall i F1-score tots igual a 1. Aquestes xifres confirmen que el nostre model de classificació presenta una capacitat altíssima de discriminació entre les diferents llengues considerades.
+Les mètriques de precisió, exhaustivitat i F1-score donen totes un valor de 1.00 per a tots els idiomes. Això vol dir que el model no només encerta gairebé sempre quan prediu un idioma concret (alta precisió), sinó que a més és capaç de detectar pràcticament totes les mostres d'aquell idioma sense deixar-ne escapar gaires (alt recall). El fet que el F1-score, que combina ambdues mètriques en una sola, sigui també 1.00 confirma que no hi ha cap idioma que penalitzi especialment el model ni en un sentit ni en l'altre.
+
+En definitiva, podem concloure que el model d'Interpolation Smoothing és perfectament apte per a la tasca de detecció d'idioma en aquest conjunt de dades, i que la seva capacitat de discriminació entre les sis llengues considerades és altíssima. La combinació de trigrames, bigrames, unigrames i la distribució uniforme proporciona una estimació de probabilitat suficientment robusta per gestionar bé tant les seqüències vistes durant l'entrenament com aquelles que apareixen per primera vegada al conjunt de test, sense necessitat de recórrer a cap mena de penalització addicional per als casos desconeguts.
+De fet, el rendiment obtingut és tan elevat que no hem considerat necessari realitzar una cerca exhaustiva d'hiperparàmetres, a diferència del que vam fer amb el model de Lidstone. Qualsevol millora derivada d'un ajust fi dels pesos λ seria, en el millor dels casos, marginal i difícilment apreciable sobre aquestes dades.
