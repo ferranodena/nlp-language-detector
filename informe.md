@@ -1,65 +1,67 @@
 <style>
 /* Estils globals del document */
+/* Estils globals del document */
 body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 9pt;
   text-align: justify;
-  line-height: 1.4;
-  margin: 0.5cm;  /* Marges generals del body reduïts */
+  line-height: 1.5; /* Lleuger augment per millorar la llegibilitat en paràgrafs densos */
+  margin: 1cm;      /* Un marge estable, no tan extrem com 0.5cm ni l'estàndard web gegant */
 }
 
 /* Paràgrafs justificats */
 p {
   text-align: justify;
   font-size: 9pt;
-  margin: 0.3rem 0;  /* Marges verticals reduïts */
+  margin: 0.6rem 0; /* Espaiat clar entre paràgrafs per no fer paret de text */
 }
 
 /* Estils per a les llistes amb la mateixa mida que el text normal */
 ul, ol, code {
   font-size: 9pt;
-  line-height: 1.4;
-  margin: 0.3rem 0;  /* Marges verticals reduïts */
+  line-height: 1.5;
+  margin: 0.5rem 0;
 }
 
 li {
   font-size: 9pt;
-  line-height: 1.4;
-  margin: 0.2rem 0;  /* Marges entre elements de llista reduïts */
+  line-height: 1.5;
+  margin: 0.3rem 0; /* Lleuger espaiat entre elements de la llista */
 }
 
 /* Títols més petits */
 h1 {
   font-size: 13pt;
   text-align: left;
-  margin: 0.5rem 0 0.4rem 0;  /* Marges reduïts */
+  margin: 1rem 0 0.6rem 0;  /* Aire superior per separar seccions principals */
 }
 
 h2 {
   font-size: 12pt;
   text-align: left;
   font-weight: bold;
-  margin: 0.4rem 0 0.3rem 0;  /* Marges reduïts */
+  margin: 0.9rem 0 0.5rem 0;
 }
 
 h3 {
   font-size: 11pt;
   text-align: left;
   font-weight: bold;
-  margin: 0.3rem 0 0.3rem 0;  /* Marges reduïts */
+  margin: 0.8rem 0 0.4rem 0;
 }
 
 h4 {
   font-size: 9pt;
   text-align: left;
-  margin: 0.3rem 0 0.2rem 0;  /* Marges reduïts */
+  font-weight: bold;
+  margin: 0.6rem 0 0.3rem 0;
 }
 
 h5{
   font-size: 9pt;
   text-align: left;
   text-decoration: underline;
-  margin: 0.3rem 0 0.2rem 0;  /* Marges reduïts */
+  margin: 0.5rem 0 0.3rem 0;
 }
 
 /* CORRECCIONS PER A BLOCS DE CODI */
@@ -362,10 +364,24 @@ code {
     - [4.1.1 Implementació](#411-implementació)
     - [4.1.2 Refinament del paràmetre $\\lambda$](#412-refinament-del-paràmetre-lambda)
     - [4.1.3 Anàlisi dels resultats i errors](#413-anàlisi-dels-resultats-i-errors)
+  - [4.2 Interpolation Smoothing](#42-interpolation-smoothing)
+    - [4.2.1 Implementació](#421-implementació)
+    - [4.2.2 Anàlisi dels resultats i errors](#422-anàlisi-dels-resultats-i-errors)
+
+<div class="page-break"></div>
 
 ## 1. Introducció
 
+El reconeixement automàtic d'idiomes és una tasca fonamental dins del camp del Processament del Llenguatge Natural (NLP) que permet categoritzar textos desconeguts cap a la llengua corresponent. L'objectiu principal d'aquesta pràctica és dissenyar, implementar i avaluar un model estadístic generatiu capaç de predir l'idioma d'un document donat. Per assolir-ho, es construeix un model de llenguatge basat en seqüències de caràcters, concretament utilitzant trigrames, ja que capturen eficaçment les estructures morfològiques pròpies de cada idioma sense dependre de diccionaris complets de paraules. Concretament, s'apliquen les tècniques de suavització Lidstone i Interpolation per a gestionar els problemes de zero probabilitat associats a trigrames no observats durant l'entrenament. Aquestes tècniques permeten que el model pugui generalitzar millor a textos desconeguts, assignant probabilitats raonables fins i tot a trigrames que no s'han vist abans.
+A més de la construcció bàsica del model basada en freqüències, s'aprofondeix en l'optimització dels seus hiperparàmetres mitjançant tècniques de validació creuada sobre el conjunt d'entrenament, per tal de prevenir el sobreajustament (overfitting). Finalment, es fa una rigorosa avaluació sobre un conjunt de dades independent, posant èmfasi no només en el percentatge d'encert (accuracy), sinó en una anàlisi detallada de la matriu de confusió i els possibles motius darrere de les classificacions errònies del model.
+
 ## 2. Dades del problema
+
+El sistema s'entrena a partir de col·leccions de text proporcionades per la *Leipzig Corpora Collection*. Aquest projecte recopila textos de manera automàtica d'Internet (principalment articles de notícies i pàgines web) i els estructura en un format homogeni per a centenars d'idiomes. Els textos originals ja vénen filtrats, dividits frase per frase i barrejats aleatòriament, cosa que ens proporciona una base de dades neta, imparcial i estandarditzada. [huggingface](https://huggingface.co/datasets/imvladikon/leipzig_corpora_collection)
+
+Aquest corpus està dividit en dos conjunts completament separats: un d'entrenament, per extreure l'estadística del llenguatge, i un de test per a l'avaluació. Abans d'extreure'n els trigrames, s'aplica una fase imprescindible de preprocessament. Totes les frases del text es netegen i es concatenen separades per dos espais en blanc. Això permet que el model pugui aprendre tant l'estructura interna de les paraules com les lletres que marquen els inicis i els finals, evitant que es formin seqüències falses basades només en salts de línia o espais irrellevants. Un cop preparat el text, es compten les freqüències dels trigrames per a cada idioma i es descarten aquells que apareixen poques vegades per optimitzar el rendiment.
+
+<div class="page-break"></div>
 
 ## 3. Preprocessament
 
@@ -414,7 +430,7 @@ En termes de codi, el model es defineix com una classe `LanguageDetector`, que i
 
 #### 4.1.2 Refinament del paràmetre $\lambda$
 
-Un cop implementat el model amb Lidstone Smoothing, es procedeix a refinar el paràmetre $\lambda$ per optimitzar el rendiment del model. Aquesta etapa és crucial perquè el valor de $\lambda$ afecta directament la suavització de les probabilitats dels trigrames i, per tant, la capacitat del model per generalitzar a dades noves. Aquí tens l'explicació ampliada, conservant el to tècnic i aprofundint en els passos clau de l'algorisme i els mecanismes d'avaluació. Entrem en detall de com funciona aquest mètode.
+Un cop implementat el model amb Lidstone Smoothing, es procedeix a refinar el paràmetre $\lambda$ per optimitzar el rendiment del model. Aquesta etapa és crucial perquè el valor de $\lambda$ afecta directament la suavització de les probabilitats dels trigrames i, per tant, la capacitat del model per generalitzar a dades noves. Entrem en detall de com funciona aquest mètode.
 
 El mètode comença llegint el diccionari de freqüències que ja ha generat la fase de `fit` (on cada clau és un trigrama i el valor n'és la freqüència absoluta). Com que per fer la validació creuada necessitem fer particions, el mètode "descomprimeix" o aplana aquest diccionari en una única llista on els trigrames es repeteixen tantes vegades com indica el seu compte. D'aquesta manera, mantenim la distribució estadística real del corpus original de cada idioma. A continuació, remena (*shuffle*) la llista de manera aleatòria i la divideix en $k$ parts iguals (per defecte 4). Això permet estructurar un procés iteratiu on, a cada pas, es fa servir un bloc diferent com a conjunt de validació ($25\%$ de les dades) mentre s'entrena el model amb la resta dels blocs sumats (el $75\%$ de les dades restants).
 L'aportació més rellevant d'aquest mètode és la seva avaluació. Per a cada un dels candidats d'hiperparàmetres establerts a `lambdas_to_test` ($0.001, 0.01, \dots$), el codi prova a avaluar **individualment** cada trigrama de la partició de validació com si es tractés d'un minúscul text desconegut. S'extreu la probabilitat logarítmica d'aquest trigrama concret utilitzant el diccionari generat al *train fold* combinat amb el valor del $\lambda$ candidat actual (ja sigui atorgant probabilitat clàssica a trigrames coneguts, o aplicant l'atenuació logarítmica extrema als desconeguts, també anomenats casos *Out Of Vocabulary*).
@@ -536,7 +552,7 @@ El primer que destaca és la forta concentració de valors a la diagonal princip
 
 Aquesta diferència abismal respecte al ~50% obtingut durant el `refining_lambda` s'explica perquè ara no s'està avaluant l'idioma d'un sol trigrama aïllat (3 lletres descontextualitzades), sinó l'acumulació de probabilitats de tots els trigrames d'un text o una frase sencera, on l'estadística esdevé molt robusta. Els errors (nombres fora de la diagonal) són residuals, però permeten observar les relacions i similituds lingüístiques que confonen el model:
 
-**La principal font d'error implica l'Anglès (`eng`):** Si mirem la columna `eng`, veiem que 8 textos alemanys, 4 francesos, 7 italians, 9 neerlandesos i 5 espanyols s'han classificat erròniament com a anglès. Això podria deure's a la presència d'anglicismes internacionals, noms propis o URL dins els textos de prova d'aquests idiomes, o bé a que el model en anglès tingui una distribució de lletres molt neutra i dominant. També podem dentar la **relació Germànica (`deu` vs `nld`):** Es noten lleugeres confusions creuades entre l'alemany i el neerlandès per la seva mateixa arrel lingüística. 4 textos neerlandesos (`nld`) s'han predit com a alemany (`deu`), i 6 textos alemanys s'han predit com a neerlandès.
+**La principal font d'error implica l'Anglès (`eng`):** Si mirem la columna `eng`, veiem que 8 textos alemanys, 4 francesos, 7 italians, 9 neerlandesos i 5 espanyols s'han classificat erròniament com a anglès. Això podria deure's a la presència d'anglicismes internacionals, noms propis o URL dins els textos de prova d'aquests idiomes, o bé a que el model en anglès tingui una distribució de lletres molt neutra i dominant. També podem veure la **relació Germànica (`deu` vs `nld`):** Es noten lleugeres confusions creuades entre l'alemany i el neerlandès per la seva mateixa arrel lingüística. 4 textos neerlandesos (`nld`) s'han predit com a alemany (`deu`), i 6 textos alemanys s'han predit com a neerlandès.
 Finalment podem veure la**relació Romànica:** També s'observen confusions menors entre les llengües derivades del llatí. L'espanyol i el francès es confonen mútuament 8 cops; l'espanyol i l'italià es confonen 5 i 4 cops respectivament.
 
 Si analitzem les frases mal classificades, podem veure certs patrons en les frases que el model ha etiquetat erròniament, podem observar diferents patrons que expliquen aquestes confusions, i els hem classificat en diferents categories:
@@ -596,31 +612,32 @@ Si analitzem les frases mal classificades, podem veure certs patrons en les fras
 El model d’Interpolation Smoothing s’ha utilitzat com una millora respecte al suavitzat de Lidstone, ja que permet combinar informació de diferents nivells de n-grams per aconseguir prediccions més estables. La idea principal d’aquest mètode és que no sempre és necessari dependre únicament de la freqüència del trigram complet, sinó que també pot ser útil considerar informació parcial quan el trigram exacte no apareix en el corpus d’entrenament.
 
 #### 4.2.1 Implementació
+
 En concret, la probabilitat d’un trigram es calcula com una combinació lineal de quatre components diferents: la probabilitat del trigram complet, la del bigram associat (els dos últims caràcters del trigram), la del unigram corresponent i, finalment, una probabilitat uniforme que actua com a salvaguarda quan el model es troba amb seqüències desconegudes.
 
 Matemàticament, aquesta combinació es representa com:
 
-
-\[
+$$
 P_{interp}(t)=
 \lambda_3 P_3(t)+
 \lambda_2 P_2(t)+
 \lambda_1 P_1(t)+
 \lambda_0 P_u
-\]
+$$
 
 On cada terme té el següent significat:
 
-- \(P_3(t)\) és la probabilitat estimada del trigram observat dins del corpus d’entrenament.  
-- \(P_2(t)\) correspon a la probabilitat del bigram associat, format pels dos darrers caràcters del trigram.  
-- \(P_1(t)\) representa la probabilitat del unigram associat al darrer caràcter.  
-- \(P_u = \frac{1}{V}\) és una distribució uniforme sobre l’alfabet de mida \(V\), que ajuda a evitar probabilitats zero en casos on la seqüència no s’ha observat mai.
+- $P_3(t)$ és la probabilitat estimada del trigram observat dins del corpus d’entrenament.  
+- $P_2(t)$ correspon a la probabilitat del bigram associat, format pels dos darrers caràcters del trigram.  
+- $P_1(t)$ representa la probabilitat del unigram associat al darrer caràcter.  
+- $P_u = \frac{1}{V}$ és una distribució uniforme sobre l’alfabet de mida $V$, que ajuda a evitar probabilitats zero en casos on la seqüència no s’ha observat mai.
 
-Els coeficients \(\lambda_i\) han de complir que la seva suma sigui igual a 1 i que cap d’ells sigui negatiu, de manera que la combinació resulti en una distribució de probabilitat vàlida.
+Els coeficients $\lambda_i$ han de complir que la seva suma sigui igual a 1 i que cap d’ells sigui negatiu, de manera que la combinació resulti en una distribució de probabilitat vàlida.
 
 Durant l’entrenament del model, es calculen els comptadors de freqüència dels diferents nivells de n-grams per a cada idioma. Posteriorment, aquests comptadors s’utilitzen juntament amb els pesos d’interpolació per obtenir una estimació global de la probabilitat del document.
 
 En termes de codi, definim el model com una altra classe, `InterpolationLanguageModel`, amb els seguents mètodes:
+
 - `__init__`: inicialitza el model amb valors de lambda per defecte.
 - `fit`: permet entrenar el model a partir d’un conjunt de trigrames emmagatzemats en format JSON, calculant les freqüències dels diferents n-grams necessaris per estimar les probabilitats condicionals. Internament, el mètode `_fit_from_dict` construeix els comptadors estadístics d’unigrames, bigrames i trigrames, així com els comptadors de context associats, que són necessaris per a l’estimació correcta de les probabilitats condicionals.
 - `load_model`: carrega un model preentrenat dins d'un fitxer `.json`.
@@ -636,33 +653,86 @@ Un cop entrenat el model, procedim a validar-lo amb el corpus d'entrenament. Com
 <div class="image-row">
   <div class="image-column">
     <img src="./images/confusion_matrix_interpolation.png" alt="Matriu de Confusió">
-    <div class="caption">Figura 1: Matriu de confusió del model amb Lidstone Smoothing.</div>
+    <div class="caption">Figura 2: Matriu de confusió del model amb Lidstone Smoothing.</div>
   </div>
 </div>
 
 Observem que, al igual que en el model anterior, obtenim un rendiment gairebé perfecte. Per a cada idioma, el model avalua 6.000 mostres i les xifres d'encert per idioma són:
 
-- Alemany (deu): 99,6%
-- Anglès (eng): 99,68%
-- Francès (fra): 99,97%
-- Italià (ita): 99,77%
-- Neerlandès (nld): 99,78%
-- Espanyol (spa): 99,9%
+- Alemany (`deu`): 99,6%
+- Anglès (`eng`): 99,68%
+- Francès (`fra`): 99,97%
+- Italià (`ita`): 99,77%
+- Neerlandès (`nld`): 99,78%
+- Espanyol (`spa`): 99,9%
 
 Aquests resultats són molt similars als que vam obtenir amb el model de Lidstone, la qual cosa ens indica que tots dos models s'acaben comportant de manera gairebé equivalent sobre aquest conjunt de dades. Tot i així, sí que s'aprecien petites diferències entre els dos: per exemple, l'espanyol millora lleugerament passant del 99,70% al 99,90%, i el francès pràcticament no comet cap error. En canvi, l'alemany pateix una petita davallada respecte al Lidstone, baixant del 99,73% al 99,60%. Aquestes diferències, però, són tan petites que no permeten concloure que un model sigui clarament superior a l'altre; en tot cas, apunten que la interpolació afegeix una mica de robustesa en alguns idiomes i perd una mica en d'altres, segurament en funció de com de ben representats estan els n-grames de cada nivell en el corpus d'entrenament.
 
 Podem analitzar també les mètriques de rendiment:
 
-| Classe | Precision | Recall | F1-score | Support |
-|--------|-----------|--------|----------|---------|
-| deu | 1.00 | 1.00 | 1.00 | 5986 |
-| eng | 1.00 | 1.00 | 1.00 | 5987 |
-| fra | 1.00 | 1.00 | 1.00 | 6000 |
-| ita | 1.00 | 1.00 | 1.00 | 6000 |
-| nld | 1.00 | 1.00 | 1.00 | 6000 |
-| spa | 1.00 | 1.00 | 1.00 | 6000 |
+<div class="table-container">
+  <div class="table-title">Mètriques de Rendiment per Idioma al Conjunt de Test</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Classe</th>
+        <th>Precision</th>
+        <th>Recall</th>
+        <th>F1-score</th>
+        <th>Support</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>deu</strong></td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>5986</td>
+      </tr>
+      <tr>
+        <td><strong>eng</strong></td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>5987</td>
+      </tr>
+      <tr>
+        <td><strong>fra</strong></td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>6000</td>
+      </tr>
+      <tr>
+        <td><strong>ita</strong></td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>6000</td>
+      </tr>
+      <tr>
+        <td><strong>nld</strong></td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>6000</td>
+      </tr>
+      <tr>
+        <td><strong>spa</strong></td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>1.00</td>
+        <td>6000</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="table-caption">
+    Taula 2: Mètriques detallades d'avaluació del model.
+  </div>
+</div>
 
 Les mètriques de precisió, exhaustivitat i F1-score donen totes un valor de 1.00 per a tots els idiomes. Això vol dir que el model no només encerta gairebé sempre quan prediu un idioma concret (alta precisió), sinó que a més és capaç de detectar pràcticament totes les mostres d'aquell idioma sense deixar-ne escapar gaires (alt recall). El fet que el F1-score, que combina ambdues mètriques en una sola, sigui també 1.00 confirma que no hi ha cap idioma que penalitzi especialment el model ni en un sentit ni en l'altre.
 
 En definitiva, podem concloure que el model d'Interpolation Smoothing és perfectament apte per a la tasca de detecció d'idioma en aquest conjunt de dades, i que la seva capacitat de discriminació entre les sis llengues considerades és altíssima. La combinació de trigrames, bigrames, unigrames i la distribució uniforme proporciona una estimació de probabilitat suficientment robusta per gestionar bé tant les seqüències vistes durant l'entrenament com aquelles que apareixen per primera vegada al conjunt de test, sense necessitat de recórrer a cap mena de penalització addicional per als casos desconeguts.
-De fet, el rendiment obtingut és tan elevat que no hem considerat necessari realitzar una cerca exhaustiva d'hiperparàmetres, a diferència del que vam fer amb el model de Lidstone. Qualsevol millora derivada d'un ajust fi dels pesos λ seria, en el millor dels casos, marginal i difícilment apreciable sobre aquestes dades.
+De fet, el rendiment obtingut és tan elevat que no hem considerat necessari realitzar una cerca exhaustiva d'hiperparàmetres, a diferència del que vam fer amb el model de Lidstone. Qualsevol millora derivada d'un ajust fi dels pesos `λ` seria, en el millor dels casos, marginal i difícilment apreciable sobre aquestes dades.
