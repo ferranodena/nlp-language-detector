@@ -609,11 +609,11 @@ Si analitzem les frases mal classificades, podem veure certs patrons en les fras
 
 ### 4.2 Interpolation Smoothing
 
-El model d’Interpolation Smoothing s’ha utilitzat com una millora respecte al suavitzat de Lidstone, ja que permet combinar informació de diferents nivells de n-grams per aconseguir prediccions més estables. La idea principal d’aquest mètode és que no sempre és necessari dependre únicament de la freqüència del trigram complet, sinó que també pot ser útil considerar informació parcial quan el trigram exacte no apareix en el corpus d’entrenament.
+El model d’Interpolation Smoothing s’ha utilitzat com una millora respecte al suavitzat de Lidstone, ja que permet combinar informació de diferents nivells de n-grames per aconseguir prediccions més estables. La idea principal d’aquest mètode és que no sempre és necessari dependre únicament de la freqüència del trigrama complet, sinó que també pot ser útil considerar informació parcial quan el trigrama exacte no apareix en el corpus d’entrenament.
 
 #### 4.2.1 Implementació
 
-En concret, la probabilitat d’un trigram es calcula com una combinació lineal de quatre components diferents: la probabilitat del trigram complet, la del bigram associat (els dos últims caràcters del trigram), la del unigram corresponent i, finalment, una probabilitat uniforme que actua com a salvaguarda quan el model es troba amb seqüències desconegudes.
+En concret, la probabilitat d’un trigrama es calcula com una combinació lineal de quatre components diferents: la probabilitat del trigrama complet, la del bigrama associat (els dos últims caràcters del trigrama), la del unigrama corresponent i, finalment, una probabilitat uniforme que actua com a salvaguarda quan el model es troba amb seqüències desconegudes.
 
 Matemàticament, aquesta combinació es representa com:
 
@@ -634,15 +634,15 @@ On cada terme té el següent significat:
 
 Els coeficients $\lambda_i$ han de complir que la seva suma sigui igual a 1 i que cap d’ells sigui negatiu, de manera que la combinació resulti en una distribució de probabilitat vàlida.
 
-Durant l’entrenament del model, es calculen els comptadors de freqüència dels diferents nivells de n-grams per a cada idioma. Posteriorment, aquests comptadors s’utilitzen juntament amb els pesos d’interpolació per obtenir una estimació global de la probabilitat del document.
+Durant l’entrenament del model, es calculen els comptadors de freqüència dels diferents nivells de n-grames per a cada idioma. Posteriorment, aquests comptadors s’utilitzen juntament amb els pesos d’interpolació per obtenir una estimació global de la probabilitat del document.
 
 En termes de codi, definim el model com una altra classe, `InterpolationLanguageModel`, amb els seguents mètodes:
 
 - `__init__`: inicialitza el model amb valors de lambda per defecte.
-- `fit`: permet entrenar el model a partir d’un conjunt de trigrames emmagatzemats en format `.json`, calculant les freqüències dels diferents n-grams necessaris per estimar les probabilitats condicionals. Internament, el mètode `_fit_from_dict` construeix els comptadors estadístics d’unigrames, bigrames i trigrames, així com els comptadors de context associats, que són necessaris per a l’estimació correcta de les probabilitats condicionals.
+- `fit`: permet entrenar el model a partir d’un conjunt de trigrames emmagatzemats en format `.json`, calculant les freqüències dels diferents n-grames necessaris per estimar les probabilitats condicionals. Internament, el mètode `_fit_from_dict` construeix els comptadors estadístics d’unigrames, bigrames i trigrames, així com els comptadors de context associats, que són necessaris per a l’estimació correcta de les probabilitats condicionals.
 - `load_model`: carrega un model preentrenat dins d'un fitxer `.json`.
 - `predict_text`: realitza la classificació d’un text preprocessat calculant la probabilitat logarítmica interpolada per a cada idioma i seleccionant l’idioma amb la puntuació més alta.
-- `_interpolated_log_prob`: implementa el càlcul central del model, estimant la probabilitat logarítmica d’un trigram mitjançant estimadors de màxima versemblança condicionals i aplicant els pesos d’interpolació.
+- `_interpolated_log_prob`: implementa el càlcul central del model, estimant la probabilitat logarítmica d’un trigrama mitjançant estimadors de màxima versemblança condicionals i aplicant els pesos d’interpolació.
 - `_score_text`: calcula la puntuació global d’un document sumant les contribucions logarítmiques de tots els trigrames presents.
 - `evaluate`: permet avaluar el rendiment del model sobre un corpus de prova en format `.json`.
 
@@ -732,7 +732,7 @@ Podem analitzar també les mètriques de rendiment:
   </div>
 </div>
 
-Les mètriques de precisió, exhaustivitat i F1-score donen totes un valor de 1.00 per a tots els idiomes. Això vol dir que el model no només encerta gairebé sempre quan prediu un idioma concret (alta precisió), sinó que a més és capaç de detectar pràcticament totes les mostres d'aquell idioma sense deixar-ne escapar gaires (alt recall). El fet que el F1-score, que combina ambdues mètriques en una sola, sigui també 1.00 confirma que no hi ha cap idioma que penalitzi especialment el model ni en un sentit ni en l'altre.
+Les mètriques de precisió, exhaustivitat i F1-score donen totes un valor de 1 per a tots els idiomes. Això vol dir que el model no només encerta gairebé sempre quan prediu un idioma concret (alta precisió), sinó que a més és capaç de detectar pràcticament totes les mostres d'aquell idioma sense deixar-ne escapar gaires (alt recall). El fet que el F1-score, que combina ambdues mètriques en una sola, sigui també 1 confirma que no hi ha cap idioma que penalitzi especialment el model ni en un sentit ni en l'altre.
 
 En definitiva, podem concloure que el model d'Interpolation Smoothing és perfectament apte per a la tasca de detecció d'idioma en aquest conjunt de dades, i que la seva capacitat de discriminació entre les sis llengues considerades és altíssima. La combinació de trigrames, bigrames, unigrames i la distribució uniforme proporciona una estimació de probabilitat suficientment robusta per gestionar bé tant les seqüències vistes durant l'entrenament com aquelles que apareixen per primera vegada al conjunt de test, sense necessitat de recórrer a cap mena de penalització addicional per als casos desconeguts.
 De fet, el rendiment obtingut és tan elevat que no hem considerat necessari realitzar una cerca exhaustiva d'hiperparàmetres, a diferència del que vam fer amb el model de Lidstone. Qualsevol millora derivada d'un ajust fi dels pesos `λ` seria, en el millor dels casos, marginal i difícilment apreciable sobre aquestes dades.
@@ -740,7 +740,7 @@ De fet, el rendiment obtingut és tan elevat que no hem considerat necessari rea
 Pero per molt bo que sigui el model, cal analitzar en quins casos s'equivoca, per identificar patrons i errors que ens puguin ajudar a millorar-lo. Com hem fet amb el model Lidstone, classifiquem els errors en diferents categories:
 
 1. **Frases massa curtes:**
-  En alguns casos tenim frases que són molt curtes. Quan això passa, hi ha una manca d'informació, ja que el model disposa de pocs trigrames per estimar la probabilitat d'un idioma. Quan el nombre de trigrames és baix, les diferències entre idiomes es tornen molt petites, cosa que dificulta la classificació correcta. Aquesta és una de les limitacions principals dels models basats en n-grams de caràcters. Alguns exemples d’aquest comportament són:
+  En alguns casos tenim frases que són molt curtes. Quan això passa, hi ha una manca d'informació, ja que el model disposa de pocs trigrames per estimar la probabilitat d'un idioma. Quan el nombre de trigrames és baix, les diferències entre idiomes es tornen molt petites, cosa que dificulta la classificació correcta. Aquesta és una de les limitacions principals dels models basats en n-grames de caràcters. Alguns exemples d’aquest comportament són:
 
   ```text
   [REAL=eng | PRED=spa] $. per meal.
