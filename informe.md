@@ -1,5 +1,8 @@
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
+</script>
 <style>
-/* Estils globals del document */
 /* Estils globals del document */
 body {
   font-family: Helvetica, Arial, sans-serif;
@@ -362,7 +365,7 @@ code {
 - [4. Implementació dels models](#4-implementació-dels-models)
   - [4.1 Lidstone Smoothing](#41-lidstone-smoothing)
     - [4.1.1 Implementació](#411-implementació)
-    - [4.1.2 Refinament del paràmetre $\\lambda$](#412-refinament-del-paràmetre-lambda)
+    - [4.1.2 Refinament del paràmetre lambda](#412-refinament-del-paràmetre-lambda)
     - [4.1.3 Anàlisi dels resultats i errors](#413-anàlisi-dels-resultats-i-errors)
   - [4.2 Interpolation Smoothing](#42-interpolation-smoothing)
     - [4.2.1 Implementació](#421-implementació)
@@ -428,7 +431,7 @@ En termes de codi, el model es defineix com una classe `LanguageDetector`, que i
 - `refining_lambda`: Realitza una validació creuada per a refinar el valor de $\lambda$, provant diferents valors i seleccionant aquell que maximitza l'accuracy del model. Aquest mètode sobreescriu el valor de $\lambda$ del model amb el valor optimitzat.
 - `evaluate_model`: Avalua el rendiment del model amb les dades de test, calculant l'accuracy i la matriu de confusió.
 
-#### 4.1.2 Refinament del paràmetre $\lambda$
+#### 4.1.2 Refinament del paràmetre lambda
 
 Un cop implementat el model amb Lidstone Smoothing, es procedeix a refinar el paràmetre $\lambda$ per optimitzar el rendiment del model. Aquesta etapa és crucial perquè el valor de $\lambda$ afecta directament la suavització de les probabilitats dels trigrames i, per tant, la capacitat del model per generalitzar a dades noves. Entrem en detall de com funciona aquest mètode.
 
@@ -526,20 +529,39 @@ Els resultats d'aquest procés es poden observar a la taula següent, on es most
     </tbody>
   </table>
   <div class="table-caption">
-    Taula 1: Accuracy obtinguda durant la validació creuada per a diferents valors de λ.
+    Taula 1: Accuracy obtinguda durant la validació creuada per a diferents valors de lambda.
   </div>
 </div>
 
+A simple vista, les precisions obtingudes durant el procés de validació creuada (amb uns percentatges que oscil·len únicament entre el 44% i el 51%) poden semblar inusualment baixes per a un model que posteriorment demostra ser pràcticament perfecte. No obstant això, aquest fenomen es pot explicar fàcilment si tenim en compte la exactament què s'està avaluant en aquesta fase.
+
+Durant aquesta fase d'optimització, el sistema no està intentant classificar frases senceres ni paràgrafs, sinó que se li exigeix endevinar l'idioma a partir de **trigrames individuals completament aïllats**. Des d'un punt de vista estadístic, intentar deduir a quina llengua pertany una seqüència de només tres caràcters, sense cap mena de context, és una tasca altament ambigua i, sovint, impossible. 
+
+Això es fa evident quan pensem en conjuncions, articles, preposicions curtes o afixos verbals que es comparteixen fonèticament i estructuralment entre múltiples idiomes europeus. Per exemple, trigrames com `" la"`, `" de"`, o fins i tot espais intermedis com `" a "`, apareixen de manera abundant en espanyol, italià i francès. Quan l'algorisme intenta validar un d'aquests trigrames pertanyent originalment al conjunt d'entrenament de l'espanyol, es veu obligat a comparar les probabilitats. Si resulta que el model italià presenta una freqüència històrica lleugerament més alta per a aquella seqüència concreta de tres lletres, la predicció es marcarà automàticament com un error (fals negatiu), malgrat que el trigrama inicial formava part d'una paraula espanyola totalment legítima. 
+
+És per aquest motiu que l'anglès, que comparteix molts caràcters estructurals amb les altres llengües però presenta certes particularitats lèxiques, s'endú l'accuracy més baixa de la taula (al voltant del 44%).
+
 #### 4.1.3 Anàlisi dels resultats i errors
 
-Un cop refinat el paràmetre $\lambda$ i seleccionat el valor que proporciona la millor precisió, es procedeix a avaluar el model amb les dades de test. Primer de tot observem la matriu de confusió obtinguda:
+Primer de tot visualitzem la matriu de confusió obtinguda després d'aplicar el model amb Lidstone Smoothing al conjunt de test, sense refinar el paràmetre $\lambda$:
 
 <div class="image-row">
   <div class="image-column">
     <img src="./images/confusion_matrix_lidstone.png" alt="Matriu de Confusió">
-    <div class="caption">Figura 1: Matriu de confusió del model amb Lidstone Smoothing.</div>
+    <div class="caption">Figura 1: Matriu de confusió del model amb Lidstone Smoothing, sense refinar lambda
   </div>
 </div>
+
+Veiem que el model ja mostra un rendiment molt alt, amb una forta concentració de valors a la diagonal principal (les caselles blau fosc), indicant que el model encerta de manera aclaparadora l'idioma correcte. No obstant això, encara es poden observar alguns errors residuals (nombres fora de la diagonal) que permeten analitzar les relacions i similituds lingüístiques que confonen el model. Provem d'avaluar el model amb el valor de $\lambda$ que ha proporcionat la millor precisió durant la validació creuada, i observem com millora encara més l'accuracy global, arribant a percentatges pràcticament perfectes per a cada idioma:
+
+<div class="image-row">
+  <div class="image-column">
+    <img src="./images/confusion_matrix_interpolation0.png" alt="Matriu de Confusió">
+    <div class="caption">Figura 2: Matriu de confusió del model amb Lidstone Smoothing.</div>
+  </div>
+</div>
+
+Veiem que hi ha una millora de la quantitat d'encerts, però és mínima, ja que el model ja era molt bo abans de refinar el paràmetre $\lambda$. Pel que fa a l'accuracy, les diferències són pràcticament inapreciables, l'accuracy del primer model era del 99.7982% i el model refinat amb el millor $\lambda$ és del 99.8167%, una millora de només 0.02 punts percentuals, que es pot considerar negligible en termes pràctics, però que demostra que el procés de validació creuada ha ajudat a optimitzar lleugerament el model. Per tant, passem a analitzar en detall el segon model:
 
 El primer que destaca és la forta concentració de valors a la diagonal principal (les caselles blau fosc). Això significa que el model encerta de manera aclaparadora l'idioma correcte. Per a cada un dels 6 idiomes, el model ha avaluat 6.000 mostres (ja que la suma de cada fila és 6.000). Les xifres d'encert oscil·len entre 5.970 (alemany i neerlandès, els "pitjors") i 5.994 (francès, el millor), cosa que suposa una exactitud per a cada idioma de:
 
@@ -562,9 +584,13 @@ Si analitzem les frases mal classificades, podem veure certs patrons en les fras
 
    ```text
    Frase mal classificada: 'freitag, . januar kanye west und paul mccartney bringen gemeinsame single heraus kanye west rappt nun auch mit paul mccartney (archiv).' (True: deu -> Predicted: eng)
+
    Frase mal classificada: 'anche air france, klm, thai airways, easyjet e ryanair hanno oggi cancellato i voli.' (True: ita -> Predicted: eng)
+
    Frase mal classificada: 'de band bestaat uit zanger/gitarist james bagshaw, gitarist adam smith, bassist thomas warmsley en drummer samuel toms.' (True: nld -> Predicted: eng)
+
    Frase mal classificada: 'temas como 'tonight', 'dirty dancer', 'lloro por ti', 'scape', 'hero', 'i like it', fueron parte del repertorio musical.' (True: spa -> Predicted: eng)
+
    Frase mal classificada: 'de grey's anatomy à brothers sisters" - yahoo!' (True: fra -> Predicted: eng)
     ```
 
@@ -589,20 +615,31 @@ Si analitzem les frases mal classificades, podem veure certs patrons en les fras
 
     ```text
     Frase mal classificada: 'ali adnan kadhim nassir al-tameemi ( arabisch : علي عدنان كاظم ناصر التميمي) (adhamiyah, december ) - alias ali adnan - is een irakees voetballer die bij voorkeur als linksback speelt.' (True: nld -> Predicted: eng)
+
     Frase mal classificada: 'ю. левянт moscú, de febrero, ria novosti.' (True: spa -> Predicted: ita)
+
     Frase mal classificada: 'asî es, aûn nos quedan varios dîas :d.' (True: spa -> Predicted: fra)
+
     Frase mal classificada: 'nyborg: hvad er din foretrukne bevaringsværdige bygning i nyborg kommune?' (True: deu -> Predicted: eng)
+
+    Frase mal classificada: '」 クリップした記事をmyページから読むことができます here's my content 　オトバンクは月日、完全匿名性でライトノベルやアニメなどに興味のある“オタク”ユーザー向けのチャット＆コミュニケーションアプリ「にじがくっ！' (True: eng -> Predicted: nld)
     ```
 
 4. **Errors del model:** Aquí en aquest cas, el model ha comès un error de classificació on queda clar en quin idioma està escrita la frase, però el model l'ha etiquetada erròniament. Per exemple:
 
     ```text
     Frase mal classificada: 'joder, tiene que molar mazo tener un coche que te diga "shiu shiuiuiu hola maiquel, shiuu shiuiu", pero con la voz de chiquito de la calzada.' (True: spa -> Predicted: ita)
+
     Frase mal classificada: 'american and iranian diplomats began meeting last week in vienna.' (True: eng -> Predicted: nld)
+
     Frase mal classificada: 'pilar vive a plenitud ser madre.' (True: spa -> Predicted: fra)
+
     Frase mal classificada: '"¡va por ti!, ¡ay, que nos la han quitao!' (True: spa -> Predicted: fra)
+
     Frase mal classificada: 'marzo: estalla un conflicto civil.' (True: spa -> Predicted: ita)
+
     Frase mal classificada: 'en fin, a ver si espabilamos ¡hombre!' (True: spa -> Predicted: fra)
+
     ```
 
     La llengua més comuna en aquests errors és el castellà, que es confon amb l'italià i el francès, probablement perquè comparteixen moltes paraules i estructures similars, i perquè el model pot tenir més dificultats per distingir-los quan les frases són curtes o contenen paraules comunes.
@@ -653,7 +690,7 @@ Un cop entrenat el model, procedim a validar-lo amb el corpus d'entrenament. Com
 <div class="image-row">
   <div class="image-column">
     <img src="./images/confusion_matrix_interpolation.png" alt="Matriu de Confusió">
-    <div class="caption">Figura 2: Matriu de confusió del model amb Lidstone Smoothing.</div>
+    <div class="caption">Figura 3: Matriu de confusió del model amb Lidstone Smoothing.</div>
   </div>
 </div>
 
@@ -740,45 +777,51 @@ De fet, el rendiment obtingut és tan elevat que no hem considerat necessari rea
 Pero per molt bo que sigui el model, cal analitzar en quins casos s'equivoca, per identificar patrons i errors que ens puguin ajudar a millorar-lo. Com hem fet amb el model Lidstone, classifiquem els errors en diferents categories:
 
 1. **Frases massa curtes:**
-  En alguns casos tenim frases que són molt curtes. Quan això passa, hi ha una manca d'informació, ja que el model disposa de pocs trigrames per estimar la probabilitat d'un idioma. Quan el nombre de trigrames és baix, les diferències entre idiomes es tornen molt petites, cosa que dificulta la classificació correcta. Aquesta és una de les limitacions principals dels models basats en n-grames de caràcters. Alguns exemples d’aquest comportament són:
+    En alguns casos tenim frases que són molt curtes. Quan això passa, hi ha una manca d'informació, ja que el model disposa de pocs trigrames per estimar la probabilitat d'un idioma. Quan el nombre de trigrames és baix, les diferències entre idiomes es tornen molt petites, cosa que dificulta la classificació correcta. Aquesta és una de les limitacions principals dels models basats en n-grames de caràcters. Alguns exemples d’aquest comportament són:
 
-  ```text
-  [REAL=eng | PRED=spa] $. per meal.
-  [REAL=spa | PRED=ita] no le veo lo novedoso.
-  [REAL=spa | PRED=fra] pilar vive a plenitud ser madre.
-  [REAL=spa | PRED=ita] del beagle no he escrito nada.
-  [REAL=spa | PRED=ita] me he puesto mala.
-  [REAL=eng | PRED=nld] what is seven plus zero?
-  ```
+    ```text
+    [REAL=eng | PRED=spa] $. per meal.
 
+    [REAL=deu | PRED=nld] ja, mein onkel peter.
+
+    [REAL=ita | PRED=fra] champions o europa league?
+    ```
 
 2. **Frases amb fragments en un altre idioma:**
-  Hi han algunes frases que contenen fragments escrits en un altre idioma, ja sigui per noms propis, cites, títols o expressions d'altres llengues. En aquests casos el model pot confondre's e identificar erròniament l'idioma, ja que la barreja linguística pot distorsionar la distribució de trigrames. Aquí tenim alguns exemples concrets:
+    Hi han algunes frases que contenen fragments escrits en un altre idioma, ja sigui per noms propis, cites, títols o expressions d'altres llengues. En aquests casos el model pot confondre's e identificar erròniament l'idioma, ja que la barreja linguística pot distorsionar la distribució de trigrames. Aquí tenim alguns exemples concrets:
 
-  ```text
-  [REAL=deu | PRED=eng] er lebt heute im karmapa buddhist international institute (kibi) in new delhi (indien).
-  [REAL=deu | PRED=eng] mit channing tatum, amanda seyfried. the last song ( mit dir an meiner seite) mit miley cyrus, liam hemsworth.
-  [REAL=deu | PRED=eng] im android open source project (aosp) existiert bereits ein fix.
-  [REAL=eng | PRED=nld] daniel pollack-pelzner teaches english at linfield college, in oregon.
-  [REAL=eng | PRED=nld] strong visuals (robrecht heyvaert, cinematography) and sound (hannes de maeyer, composer; joeri verspecht, sound engineer).
-  [REAL=spa | PRED=eng] the angry beavers los castores cascarrabias (the angry beavers) es una serie animada creada por mitch schauer para el canal nickelodeon en .
-  [REAL=nld | PRED=eng] geschiedenis thai airways international is opgericht in door thai airways en scandinavian airlines system.
-  [REAL=ita | PRED=spa] 'el mundo deportivò, altro quotidiano vicino al club blaugrana, titola "dios del futbol".
-  [REAL=ita | PRED=eng] secondo risky business, l'adattamento del saggio bestseller di michael lewis, moneyball: the art of winning an unfair game, potrà contare anche su jonah hill, philip seymour hoffman, robin wright e stephen bishop.
-  [REAL=ita | PRED=eng] roger waters: anche in europa 'the wall' dei pink floyd?
+    ```text
+    [REAL=deu | PRED=eng] mit channing tatum, amanda seyfried. the last song ( mit dir an meiner seite) mit miley cyrus, liam hemsworth.
 
-  ```
+    [REAL=eng | PRED=nld] daniel pollack-pelzner teaches english at linfield college, in oregon.
 
-  Aquest error es podria reduir fent un preprocessament més exhaustiu del text d'entrada. Per exemple, es podrien eliminar petits fragments entre cometes (que normalment corresponen a cites) o noms propis. Aquest mètode ajudaria a reduir la barreja de llengues i a millorar la discriminació entre classes.
+    [REAL=eng | PRED=nld] strong visuals (robrecht heyvaert, cinematography) and sound (hannes de maeyer, composer; joeri verspecht, sound engineer).
+
+    [REAL=spa | PRED=eng] the angry beavers los castores cascarrabias (the angry beavers) es una serie animada creada por mitch schauer para el canal nickelodeon en .
+
+    [REAL=nld | PRED=eng] geschiedenis thai airways international is opgericht in door thai airways en scandinavian airlines system.
+
+    [REAL=ita | PRED=spa] 'el mundo deportivò, altro quotidiano vicino al club blaugrana, titola "dios del futbol".
+
+    [REAL=ita | PRED=eng] roger waters: anche in europa 'the wall' dei pink floyd?
+    ```
+
+    Aquest error es podria reduir fent un preprocessament més exhaustiu del text d'entrada. Per exemple, es podrien eliminar petits fragments entre cometes (que normalment corresponen a cites) o noms propis. Aquest mètode ajudaria a reduir la barreja de llengues i a millorar la discriminació entre classes.
 
 3. **Errors del model:**
-  En alguns casos, encara tenint una frase extensa escrita en un únic idioma, el model falla igualment. Aquí tenim alguns exemples concrets:
+      En alguns casos, encara tenint una frase extensa escrita en un únic idioma, el model falla igualment. Aquí tenim alguns exemples concrets:
 
-```text
-[REAL=deu | PRED=nld] het consumentenvertrouwen is er in januari geklommen naar het hoogste niveau in elf jaar.
-[REAL=deu | PRED=nld] den saudiskledede koalition støtter de regeringstro grupper mod andre oprørere, der er støttet af iran. indsatsen består i både luftangreb, landtropper og våbenleverancer.
-[REAL=deu | PRED=nld] onlangs was er een beachvolleybaltoernoei in baal, de heimat van nys.
-[REAL=deu | PRED=nld] nyborg: hvad er din foretrukne bevaringsværdige bygning i nyborg kommune?
-```
+    ```text
+    [REAL=deu | PRED=nld] het consumentenvertrouwen is er in januari geklommen naar het hoogste niveau in elf jaar.
+
+    [REAL=eng | PRED=nld] what is seven plus zero?
+
+    [REAL=deu | PRED=nld] onlangs was er een beachvolleybaltoernoei in baal, de heimat van nys.
+
+    [REAL=eng | PRED=fra] the cozy arrangement raises big red flags.
+
+    [REAL=spa | PRED=fra] pilar vive a plenitud ser madre.
+  
+    ```
 
 Veiem que això només passa entre l'alemany i el neerlandès. Això és perque aquestes dues llengues són molt semblants, tant a nivell morfològic com de distribució de trigrames. Quan dues llengües comparteixen moltes seqüències de caràcters, el valor de la versemblança logarítmica que calcula el model és molt similar per a ambdues classes. En aquests casos, la decisió final depèn de diferències molt petites en el score total, cosa que fa que el classificador sigui especialment sensible al smoothing i a la variabilitat del corpus d’entrenament.
