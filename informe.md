@@ -639,7 +639,7 @@ Durant l’entrenament del model, es calculen els comptadors de freqüència del
 En termes de codi, definim el model com una altra classe, `InterpolationLanguageModel`, amb els seguents mètodes:
 
 - `__init__`: inicialitza el model amb valors de lambda per defecte.
-- `fit`: permet entrenar el model a partir d’un conjunt de trigrames emmagatzemats en format JSON, calculant les freqüències dels diferents n-grams necessaris per estimar les probabilitats condicionals. Internament, el mètode `_fit_from_dict` construeix els comptadors estadístics d’unigrames, bigrames i trigrames, així com els comptadors de context associats, que són necessaris per a l’estimació correcta de les probabilitats condicionals.
+- `fit`: permet entrenar el model a partir d’un conjunt de trigrames emmagatzemats en format `.json`, calculant les freqüències dels diferents n-grams necessaris per estimar les probabilitats condicionals. Internament, el mètode `_fit_from_dict` construeix els comptadors estadístics d’unigrames, bigrames i trigrames, així com els comptadors de context associats, que són necessaris per a l’estimació correcta de les probabilitats condicionals.
 - `load_model`: carrega un model preentrenat dins d'un fitxer `.json`.
 - `predict_text`: realitza la classificació d’un text preprocessat calculant la probabilitat logarítmica interpolada per a cada idioma i seleccionant l’idioma amb la puntuació més alta.
 - `_interpolated_log_prob`: implementa el càlcul central del model, estimant la probabilitat logarítmica d’un trigram mitjançant estimadors de màxima versemblança condicionals i aplicant els pesos d’interpolació.
@@ -736,3 +736,49 @@ Les mètriques de precisió, exhaustivitat i F1-score donen totes un valor de 1.
 
 En definitiva, podem concloure que el model d'Interpolation Smoothing és perfectament apte per a la tasca de detecció d'idioma en aquest conjunt de dades, i que la seva capacitat de discriminació entre les sis llengues considerades és altíssima. La combinació de trigrames, bigrames, unigrames i la distribució uniforme proporciona una estimació de probabilitat suficientment robusta per gestionar bé tant les seqüències vistes durant l'entrenament com aquelles que apareixen per primera vegada al conjunt de test, sense necessitat de recórrer a cap mena de penalització addicional per als casos desconeguts.
 De fet, el rendiment obtingut és tan elevat que no hem considerat necessari realitzar una cerca exhaustiva d'hiperparàmetres, a diferència del que vam fer amb el model de Lidstone. Qualsevol millora derivada d'un ajust fi dels pesos `λ` seria, en el millor dels casos, marginal i difícilment apreciable sobre aquestes dades.
+
+Pero per molt bo que sigui el model, cal analitzar en quins casos s'equivoca, per identificar patrons i errors que ens puguin ajudar a millorar-lo. Com hem fet amb el model Lidstone, classifiquem els errors en diferents categories:
+
+1. **Frases massa curtes:**
+  En alguns casos tenim frases que són molt curtes. Quan això passa, hi ha una manca d'informació, ja que el model disposa de pocs trigrames per estimar la probabilitat d'un idioma. Quan el nombre de trigrames és baix, les diferències entre idiomes es tornen molt petites, cosa que dificulta la classificació correcta. Aquesta és una de les limitacions principals dels models basats en n-grams de caràcters. Alguns exemples d’aquest comportament són:
+
+  ```text
+  [REAL=eng | PRED=spa] $. per meal.
+  [REAL=spa | PRED=ita] no le veo lo novedoso.
+  [REAL=spa | PRED=fra] pilar vive a plenitud ser madre.
+  [REAL=spa | PRED=ita] del beagle no he escrito nada.
+  [REAL=spa | PRED=ita] me he puesto mala.
+  [REAL=eng | PRED=nld] what is seven plus zero?
+  ```
+
+
+2. **Frases amb fragments en un altre idioma:**
+  Hi han algunes frases que contenen fragments escrits en un altre idioma, ja sigui per noms propis, cites, títols o expressions d'altres llengues. En aquests casos el model pot confondre's e identificar erròniament l'idioma, ja que la barreja linguística pot distorsionar la distribució de trigrames. Aquí tenim alguns exemples concrets:
+
+  ```text
+  [REAL=deu | PRED=eng] er lebt heute im karmapa buddhist international institute (kibi) in new delhi (indien).
+  [REAL=deu | PRED=eng] mit channing tatum, amanda seyfried. the last song ( mit dir an meiner seite) mit miley cyrus, liam hemsworth.
+  [REAL=deu | PRED=eng] im android open source project (aosp) existiert bereits ein fix.
+  [REAL=eng | PRED=nld] daniel pollack-pelzner teaches english at linfield college, in oregon.
+  [REAL=eng | PRED=nld] strong visuals (robrecht heyvaert, cinematography) and sound (hannes de maeyer, composer; joeri verspecht, sound engineer).
+  [REAL=spa | PRED=eng] the angry beavers los castores cascarrabias (the angry beavers) es una serie animada creada por mitch schauer para el canal nickelodeon en .
+  [REAL=nld | PRED=eng] geschiedenis thai airways international is opgericht in door thai airways en scandinavian airlines system.
+  [REAL=ita | PRED=spa] 'el mundo deportivò, altro quotidiano vicino al club blaugrana, titola "dios del futbol".
+  [REAL=ita | PRED=eng] secondo risky business, l'adattamento del saggio bestseller di michael lewis, moneyball: the art of winning an unfair game, potrà contare anche su jonah hill, philip seymour hoffman, robin wright e stephen bishop.
+  [REAL=ita | PRED=eng] roger waters: anche in europa 'the wall' dei pink floyd?
+
+  ```
+
+  Aquest error es podria reduir fent un preprocessament més exhaustiu del text d'entrada. Per exemple, es podrien eliminar petits fragments entre cometes (que normalment corresponen a cites) o noms propis. Aquest mètode ajudaria a reduir la barreja de llengues i a millorar la discriminació entre classes.
+
+3. **Errors del model:**
+  En alguns casos, encara tenint una frase extensa escrita en un únic idioma, el model falla igualment. Aquí tenim alguns exemples concrets:
+
+```text
+[REAL=deu | PRED=nld] het consumentenvertrouwen is er in januari geklommen naar het hoogste niveau in elf jaar.
+[REAL=deu | PRED=nld] den saudiskledede koalition støtter de regeringstro grupper mod andre oprørere, der er støttet af iran. indsatsen består i både luftangreb, landtropper og våbenleverancer.
+[REAL=deu | PRED=nld] onlangs was er een beachvolleybaltoernoei in baal, de heimat van nys.
+[REAL=deu | PRED=nld] nyborg: hvad er din foretrukne bevaringsværdige bygning i nyborg kommune?
+```
+
+Veiem que això només passa entre l'alemany i el neerlandès. Això és perque aquestes dues llengues són molt semblants, tant a nivell morfològic com de distribució de trigrames. Quan dues llengües comparteixen moltes seqüències de caràcters, el valor de la versemblança logarítmica que calcula el model és molt similar per a ambdues classes. En aquests casos, la decisió final depèn de diferències molt petites en el score total, cosa que fa que el classificador sigui especialment sensible al smoothing i a la variabilitat del corpus d’entrenament.
