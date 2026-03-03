@@ -370,6 +370,7 @@ code {
   - [4.2 Interpolation Smoothing](#42-interpolation-smoothing)
     - [4.2.1 Implementació](#421-implementació)
     - [4.2.2 Anàlisi dels resultats i errors](#422-anàlisi-dels-resultats-i-errors)
+- [5. Conclusions](#5-conclusions)
 
 <div class="page-break"></div>
 
@@ -825,3 +826,15 @@ Pero per molt bo que sigui el model, cal analitzar en quins casos s'equivoca, pe
     ```
 
 Veiem que això només passa entre l'alemany i el neerlandès. Això és perque aquestes dues llengues són molt semblants, tant a nivell morfològic com de distribució de trigrames. Quan dues llengües comparteixen moltes seqüències de caràcters, el valor de la versemblança logarítmica que calcula el model és molt similar per a ambdues classes. En aquests casos, la decisió final depèn de diferències molt petites en el score total, cosa que fa que el classificador sigui especialment sensible al smoothing i a la variabilitat del corpus d’entrenament.
+
+## 5. Conclusions
+
+Aquesta pràctica ha permès dissenyar, implementar i avaluar dos models estadístics de detecció d'idioma basats en trigrames de caràcters, aplicant les tècniques de suavització Lidstone i Interpolation. Els resultats obtinguts han estat altament satisfactoris, amb una precisió global altíssima en els dos models per a tots els idiomes considerats, la qual cosa valida l'enfocament basat en n-grames de caràcters com una solució robusta i eficient per a aquesta tasca.
+
+Pel que fa a la comparació entre els dos models, els resultats han estat bastant similars. L'Interpolation Smoothing, teòricament més expressiu per la seva capacitat de combinar informació de múltiples nivells de n-grames, no ha aconseguit una millora apreciable respecte al Lidstone en aquest conjunt de dades. Això suggereix que, davant d'un corpus suficientment gran i net com el de Leipzig, el suavitzat de Lidstone ja és capaç de gestionar adequadament els trigrames no observats, i la informació addicional aportada pels bigrames i unigrames no resulta determinant.
+
+L'anàlisi qualitativa dels errors ens ha mostrat que la majoria de classificacions incorrectes no responen a limitacions estructurals del model, sinó a casos inherentment complexos: frases molt curtes, textos que barregen idiomes per la presència de noms propis, títols o expressions en anglès, i frases amb caràcters especials d'alfabets no llatins. Els dos idiomes que generen més confusió mútua són l'alemany i el neerlandès, resultat esperable donada la seva proximitat tipològica i el seu origen germànic comú.
+
+De cara a treballs futurs, les línies de millora passarien per un preprocessament més acurat que gestioni de manera explícita els fragments multilingües i els noms propis, per l'exploració de models amb n-grames de longitud variable, o per la combinació de característiques a nivell de caràcter amb informació lèxica per capturar millor les particularitats de cada idioma.
+
+En conjunt, la pràctica ha permès constatar que els models de llenguatge basats en n-grames de caràcters constitueixen una eina sòlida i computacionalment eficient per a la detecció d'idioma. La seva fortalesa rau en la capacitat d'explotar la riquesa estadística d'un corpus suficientment representatiu, que permet capturar les distribucions de caràcters pròpies de cada llengua sense necessitat de recursos lingüístics addicionals com diccionaris o analitzadors morfològics.
