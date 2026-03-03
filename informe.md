@@ -827,6 +827,8 @@ Pero per molt bo que sigui el model, cal analitzar en quins casos s'equivoca, pe
 
 Veiem que això només passa entre l'alemany i el neerlandès. Això és perque aquestes dues llengues són molt semblants, tant a nivell morfològic com de distribució de trigrames. Quan dues llengües comparteixen moltes seqüències de caràcters, el valor de la versemblança logarítmica que calcula el model és molt similar per a ambdues classes. En aquests casos, la decisió final depèn de diferències molt petites en el score total, cosa que fa que el classificador sigui especialment sensible al smoothing i a la variabilitat del corpus d’entrenament.
 
+<div class="page-break"></div>
+
 ## 5. Conclusions
 
 Aquesta pràctica ha permès dissenyar, implementar i avaluar dos models estadístics de detecció d'idioma basats en trigrames de caràcters, aplicant les tècniques de suavització Lidstone i Interpolation. Els resultats obtinguts han estat altament satisfactoris, amb una precisió global altíssima en els dos models per a tots els idiomes considerats, la qual cosa valida l'enfocament basat en n-grames de caràcters com una solució robusta i eficient per a aquesta tasca.
